@@ -1,3 +1,8 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
 /certs/*.crt
 /certs/*.key
 /certs/*.pfx
@@ -5,4 +10,6 @@
 /venv/
 /*.log
 /*.pem
+/*.crt
 /certsrv.ini
+__pycache__/
