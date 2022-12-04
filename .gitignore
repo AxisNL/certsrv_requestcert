@@ -1,0 +1,6 @@
+/certs/*.crt
+/certs/*.key
+/certs/*.pfx
+/.idea/
+/venv/
+/*.log

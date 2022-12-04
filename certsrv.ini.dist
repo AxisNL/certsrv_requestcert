@@ -1,0 +1,14 @@
+[ca_server]
+hostname = ca.company.local
+template = WebServer
+auth_method = ntlm
+cacert = rootcert.pem
+username = Administrator
+password = *****
+
+[csr]
+organization = Organisation
+ou = ICT
+
+[openssl]
+executable = C:\Program Files\Git\usr\bin\openssl.exe
