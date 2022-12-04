@@ -4,7 +4,7 @@ template = WebServer
 auth_method = ntlm
 cacert = rootcert.pem
 username = Administrator
-password = *****
+password = secret123
 
 [csr]
 organization = Organisation
@@ -12,3 +12,4 @@ ou = ICT
 
 [openssl]
 executable = C:\Program Files\Git\usr\bin\openssl.exe
+export_password = secret123

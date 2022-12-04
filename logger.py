@@ -8,7 +8,7 @@ def configureLogging(verbosity_level):
 
     # Create handlers
     c_handler = logging.StreamHandler(sys.stdout)
-    logfile = "{0}.log".format(__file__)
+    logfile = "request.log"
     f_handler = logging.FileHandler(logfile)
     if verbosity_level == 0:
         c_handler.setLevel(logging.ERROR)

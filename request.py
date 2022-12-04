@@ -1,21 +1,3 @@
-# ############################################
-# Copyright (c) 2022, Angelo Hongens <angelo.hongens.nl>
-#
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
-# following conditions are met:
-#
-# Redistributions of source code must retain the above copyright notice, this list of conditions and the following
-# disclaimer. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-# the following disclaimer in the documentation and/or other materials provided with the distribution. THIS SOFTWARE
-# IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-# BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-
 import argparse
 import configparser
 import logging
@@ -29,7 +11,9 @@ def main():
     # PARSE ARGUMENTS
     #############################################################
     helptext = 'This scripts helps you request certificates from the Microsoft CA certsrv legacy service. It '
-    helptext += 'automatically includes the SAN field need, and exports different files you might need.'
+    helptext += 'automatically includes the SAN field need, and exports different files you might need. All keys and '
+    helptext += 'certificates are written to the certs subfolder'
+
     parser = argparse.ArgumentParser(
         description=helptext)
     parser.add_argument('-v', '--verbose', action='count', default=0, help='show INFO messages, repeat for DEBUG')
@@ -65,9 +49,12 @@ def main():
     csr_ou = config['csr']['ou']
 
     openssl_executable = config['openssl']['executable']
+    openssl_export_password = config['openssl']['export_password']
 
     privateykey_filename = os.path.join(certs_dir, '{0}.key'.format(args.certificatename))
     certificate_filename = os.path.join(certs_dir, '{0}.crt'.format(args.certificatename))
+    pfx_filename = os.path.join(certs_dir, '{0}.pfx'.format(args.certificatename))
+    pfx_legacy_filename = os.path.join(certs_dir, '{0}.legacy.pfx'.format(args.certificatename))
 
     # generate the private key and write it to disk
     key = functions.GenerateKey()
@@ -89,6 +76,21 @@ def main():
                                                cacert=ca_server_cacert)
     # and write it to disk.
     functions.WriteCertificate(certificate, certificate_filename)
+
+    # write the modern AES256 encrypted PFX file. This is the pythonic way using pyOpenSSL
+    functions.WritePFX(privateykey_filename,
+                       certificate_filename,
+                       pfx_filename,
+                       openssl_export_password)
+
+    # write the legacy 3DES/SHA encrypted PFX file. This calls the openssl binary, since pyOpenSSL does not support
+    # specifying the encryption methods
+    functions.WriteLegacyPFX(privateykey_filename,
+                             certificate_filename,
+                             pfx_legacy_filename,
+                             openssl_executable,
+                             openssl_export_password)
+
 
     logging.info("all done!")
 
