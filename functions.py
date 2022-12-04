@@ -32,7 +32,7 @@ def WriteKey(key, filename):
 
     with open(filename, 'w') as f:
         f.write(pem_key.decode())
-        logging.info("wrote key to {0}.".format(os.path.abspath(filename)))
+        logging.info("wrote key to '{0}'".format(os.path.abspath(filename)))
 
 
 def CreateCSR(key, certificatename, organization, ou):
@@ -66,7 +66,7 @@ def RequestCertificate(csr, hostname, template, username, password, auth_method,
 def WriteCertificate(pem_cert, certificate_filename):
     with open(certificate_filename, 'w', newline='\n') as f:
         f.write(pem_cert.decode())
-        logging.info("wrote certificate to {0}.".format(os.path.abspath(certificate_filename)))
+        logging.info("wrote certificate to '{0}'".format(os.path.abspath(certificate_filename)))
 
 
 def WritePFX(privateykey_filename, certificate_filename, pfx_filename, openssl_export_password):
@@ -82,7 +82,8 @@ def WritePFX(privateykey_filename, certificate_filename, pfx_filename, openssl_e
 
     with open(pfx_filename, 'wb') as file:
         file.write(pkcs.export(passphrase=openssl_export_password.encode('ASCII')))
-    logging.info("wrote the PFX file to '{0}' (password is '{1}').".format(os.path.abspath(pfx_filename), openssl_export_password))
+    logging.info("wrote the PFX file to '{0}' (password is '{1}')".format(pfx_filename, openssl_export_password))
+
 
 def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, openssl_executable, openssl_export_password):
     if not os.path.isfile(openssl_executable):
@@ -113,5 +114,6 @@ def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, ope
     if command_exitcode != 0:
         logging.error('openssl returned an error, quitting')
         exit(1)
-    logging.info("wrote the legacy pfx to '{0}'".format(pfx_filename))
+    logging.info("wrote the legacy PFX file to '{0}' (password is '{1}')".format(pfx_filename, openssl_export_password))
+
 

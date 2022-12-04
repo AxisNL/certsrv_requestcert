@@ -34,7 +34,7 @@ included with other software, such as git. Specify the location in the configura
 
 ## Getting started
 
-Check out the repo or download the zip to some folder, for example `c:\tools\requestcert` or something. Copy the 
+Check out the repo or extract the zip to some folder, for example `c:\tools\requestcert` or something. Copy the 
 config.ini.dist to config.ini and change the values accordingly.
 
 | section    | value           | description                                                                                  | 
@@ -57,7 +57,7 @@ Windows:
     cd c:\tools\requestcert
     python -m venv venv
     venv\Scripts\activate.bat
-    
+    pip install -r requirements.txt
 
 Linux/Mac:
 
@@ -69,7 +69,7 @@ Linux/Mac:
 That's it, now you're done.
 
 Keep in mind that if you want to use the script in the future, you first need to activate the venv again, by 
-running `venv\Scripts\activate.bat` on windows or `source venv/bin/activate` on linux/mac.
+running `venv\Scripts\activate.bat` on Windows or `source venv/bin/activate` on Linux/Mac.
 
 ### Usage
 
@@ -91,6 +91,14 @@ running `venv\Scripts\activate.bat` on windows or `source venv/bin/activate` on 
 
 See the following example. Use the -v for extra output, or you won't see anything:
 
-    python request.py -v webserver1.domain.local
+    (venv)>python request.py webserver1.domain.local -v
+
+    2022-12-04 03:45:00,107 | INFO     | starting certificate script for hostname 'webserver1.domain.local'
+    2022-12-04 03:45:00,310 | INFO     | wrote key to 'C:\tools\certsrv_requestcert\certs\webserver1.domain.local.key'
+    2022-12-04 03:45:00,325 | INFO     | requesting certificate from CA 'ca.domain.local' with template 'WebServer'
+    2022-12-04 03:45:00,404 | INFO     | wrote certificate to 'C:\tools\certsrv_requestcert\certs\webserver1.domain.local.crt'
+    2022-12-04 03:45:00,419 | INFO     | wrote the PFX file to 'C:\tools\certsrv_requestcert\certs\webserver1.domain.local.pfx' (password is 'secret123')
+    2022-12-04 03:45:00,497 | INFO     | wrote the legacy pfx to 'C:\tools\certsrv_requestcert\certs\webserver1.domain.local.legacy.pfx' (password is 'secret123')
+    2022-12-04 03:45:00,497 | INFO     | all done!
 
     
