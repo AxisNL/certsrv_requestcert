@@ -5,3 +5,4 @@
 /venv/
 /*.log
 /*.pem
+/certsrv.ini
