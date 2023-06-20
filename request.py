@@ -17,7 +17,8 @@ def main():
     parser = argparse.ArgumentParser(
         description=helptext)
     parser.add_argument('-v', '--verbose', action='count', default=0, help='show INFO messages, repeat for DEBUG')
-    parser.add_argument('certificatename', action='store', help='the name you want to get the certificate for')
+    parser.add_argument('cn', action='store', help='the name you want to get the certificate for')
+    parser.add_argument('extra_names', nargs='?', help='comma separated list of extra san names')
     args = parser.parse_args()
 
     verbosity_level = args.verbose
@@ -30,7 +31,7 @@ def main():
     #############################################################
     # START THE WORK
     #############################################################
-    logging.info("starting certificate script for hostname '{0}'".format(args.certificatename))
+    logging.info("starting certificate script for hostname '{0}'".format(args.cn))
 
     script_path = os.path.realpath(__file__)
     working_dir = os.path.dirname(script_path)
@@ -51,18 +52,24 @@ def main():
     openssl_executable = config['openssl']['executable']
     openssl_export_password = config['openssl']['export_password']
 
-    privateykey_filename = os.path.join(certs_dir, '{0}.key'.format(args.certificatename))
-    certificate_filename = os.path.join(certs_dir, '{0}.crt'.format(args.certificatename))
-    pfx_filename = os.path.join(certs_dir, '{0}.pfx'.format(args.certificatename))
-    pfx_legacy_filename = os.path.join(certs_dir, '{0}.legacy.pfx'.format(args.certificatename))
+    privateykey_filename = os.path.join(certs_dir, '{0}.key'.format(args.cn))
+    certificate_filename = os.path.join(certs_dir, '{0}.crt'.format(args.cn))
+    pfx_filename = os.path.join(certs_dir, '{0}.pfx'.format(args.cn))
+    pfx_legacy_filename = os.path.join(certs_dir, '{0}.legacy.pfx'.format(args.cn))
 
     # generate the private key and write it to disk
     key = functions.GenerateKey()
     functions.WriteKey(key, privateykey_filename)
 
-    # generate the CSR (no need to save that to disk)
+    subjectalternativenames = [args.cn]
+    tmp_sans = args.extra_names
+    if tmp_sans is not None:
+        for name in tmp_sans.split(','):
+            subjectalternativenames.append(name.strip())
+
     csr = functions.CreateCSR(key=key,
-                              certificatename=args.certificatename,
+                              cn=args.cn,
+                              subjectalternativenames=subjectalternativenames,
                               organization=csr_organization,
                               ou=csr_ou)
 

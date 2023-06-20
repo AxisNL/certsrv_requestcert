@@ -11,7 +11,8 @@ This script leans heavily on [Magnus Watn's script](https://github.com/magnuswat
 service. This script is a wrapper around his, with a bit of extra features.
 
 This script creates a private key, generates a csr and requests the certificate at your own CA, including the SAN field, 
-which is required nowadays.[^1] After that, the script exports the key and certificate to two different PFX containers:
+which is required nowadays.[^1] The default CN is included in the SAN field, but you can specify extra SAN DNS names on 
+the command line. After that, the script exports the key and certificate to two different PFX containers:
 a normal PFX container for use on Windows Server 2019 and higher, and a legacy PFX container for use on Windows Server
 2016 and earlier.[^2].
 
@@ -73,19 +74,20 @@ running `venv\Scripts\activate.bat` on Windows or `source venv/bin/activate` on 
 
 ### Usage
 
-    (venv)>python request.py -h
-    usage: request.py [-h] [-v] certificatename
+    (venv) $ python request.py  --help
+    usage: request.py [-h] [-v] cn [extra_names]
     
-    This scripts helps you request certificates from the Microsoft CA certsrv legacy service. It automatically includes
-    the SAN field need, and exports different files you might need. All keys and certificates are written to the certs
-    subfolder.
+    This scripts helps you request certificates from the Microsoft CA certsrv legacy service. It automatically includes the SAN field need, and exports different files you might need. All keys and
+    certificates are written to the certs subfolder
     
     positional arguments:
-      certificatename  the name you want to get the certificate for
+      cn             the name you want to get the certificate for
+      extra_names    comma separated list of extra san names
     
-    optional arguments:
-      -h, --help       show this help message and exit
-      -v, --verbose    show INFO messages, repeat for DEBUG
+    options:
+      -h, --help     show this help message and exit
+      -v, --verbose  show INFO messages, repeat for DEBUG
+
 
 ### Examples
 
@@ -102,3 +104,8 @@ See the following example. Use the -v for extra output, or you won't see anythin
     2022-12-04 03:45:00,497 | INFO     | all done!
 
     
+### Extra
+
+In order to see which DNS names are included in a certificate's SAN field:
+
+    openssl s_client -connect www.domain.com:443  </dev/null 2>/dev/null | openssl x509 -noout -text | grep DNS:

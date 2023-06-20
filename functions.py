@@ -1,7 +1,6 @@
 import logging
 import os
 import subprocess
-from subprocess import Popen
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
@@ -35,15 +34,19 @@ def WriteKey(key, filename):
         logging.info("wrote key to '{0}'".format(os.path.abspath(filename)))
 
 
-def CreateCSR(key, certificatename, organization, ou):
-    csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, certificatename),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization),
-        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, ou)
-    ])).add_extension(
-        x509.SubjectAlternativeName([
-            x509.DNSName(certificatename),
-        ]),
+def CreateCSR(key, cn, subjectalternativenames, organization, ou):
+    x509san_array = []
+    for san in subjectalternativenames:
+        x509san_array.append(x509.DNSName(san))
+
+    csr = x509.CertificateSigningRequestBuilder().subject_name(
+        x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, cn),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization),
+            x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, ou)
+        ])
+    ).add_extension(
+        x509.SubjectAlternativeName(x509san_array),
         critical=False,
     ).sign(key, hashes.SHA256(), default_backend())
     return csr
@@ -85,7 +88,8 @@ def WritePFX(privateykey_filename, certificate_filename, pfx_filename, openssl_e
     logging.info("wrote the PFX file to '{0}' (password is '{1}')".format(pfx_filename, openssl_export_password))
 
 
-def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, openssl_executable, openssl_export_password):
+def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, openssl_executable,
+                   openssl_export_password):
     if not os.path.isfile(openssl_executable):
         logging.error("Missing openssl executable '{0}', check your config!".format(openssl_executable))
         exit(1)
@@ -115,5 +119,3 @@ def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, ope
         logging.error('openssl returned an error, quitting')
         exit(1)
     logging.info("wrote the legacy PFX file to '{0}' (password is '{1}')".format(pfx_filename, openssl_export_password))
-
-
