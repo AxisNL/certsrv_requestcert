@@ -100,6 +100,7 @@ def WriteLegacyPFX(privateykey_filename, certificate_filename, pfx_filename, ope
                     'PBE-SHA1-3DES',
                     '-certpbe',
                     'PBE-SHA1-3DES',
+                    '-nomac',
                     '-export',
                     '-in',
                     certificate_filename,
